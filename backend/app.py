@@ -1,12 +1,13 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect, url_for
 from flask_cors import CORS
 import psycopg2
 import os
 from datetime import date
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Error handling for user-friendliness (optional)
 
+
+# Database connection function (consider using connection pooling)
 def get_db_connection():
     conn = psycopg2.connect(
         host=os.environ['DATABASE_HOST'],
@@ -16,6 +17,34 @@ def get_db_connection():
     )
     return conn
 
+# Keycloak configuration (replace with your specific values)
+config = {
+    "server_url": "http://localhost:8080",
+    "realm_name": "MyRealm",
+    "client_id": "2",
+    "redirect_uri": "http://localhost:3000",  # Replace with your application URL
+}
+
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+@app.route('/login', methods=['GET'])
+def login():
+    # Construct the Keycloak login URL with appropriate parameters
+    login_url = f"{config['server_url']}/realms/{config['realm_name']}/protocol/openid-connect/auth?"
+    login_url += f"client_id={config['client_id']}"
+    login_url += f"&redirect_uri={config['redirect_uri']}"
+    login_url += "&response_type=code"  # Request authorization code
+    login_url += "&scope=openid profile email"  # Request user profile and email
+
+    # Redirect the user to the Keycloak login page
+    return redirect(login_url)
+
+# Route for the root URL ("/") to redirect to the login page
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+# **Mask Order API Endpoints**
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
