@@ -36,4 +36,28 @@ BEGIN
     ) THEN
         ALTER TABLE mask_order ADD COLUMN filament_used INT REFERENCES filament(id) DEFAULT NULL;
     END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name='mask_order' AND column_name='filament_id'
+    ) THEN
+        ALTER TABLE mask_order ADD COLUMN filament_id INT REFERENCES filament(id) DEFAULT NULL;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name='mask_order' AND column_name='amount_used'
+    ) THEN
+        ALTER TABLE mask_order ADD COLUMN amount_used FLOAT DEFAULT 0;
+    END IF; 
+
+    ALTER TABLE filament ADD COLUMN active BOOLEAN DEFAULT TRUE;
+    ALTER TABLE colour ADD COLUMN active BOOLEAN DEFAULT TRUE;
+
+    UPDATE filament SET active = TRUE WHERE active IS NULL;
+    UPDATE colour SET active = TRUE WHERE active IS NULL;
+
 END $$;
+
