@@ -22,8 +22,8 @@ services:
       DATABASE_PASSWORD: mypassword
       DATABASE_NAME: mydatabase
       KEYCLOAK_URL: https://maski.strupino.pl/auth
-      KEYCLOAK_REALM: myrealm
-      KEYCLOAK_CLIENT_ID: myclient
+      KEYCLOAK_REALM: frontend
+      KEYCLOAK_CLIENT_ID: frontend
     volumes:
       - ./backend:/app
     ports:
@@ -39,8 +39,8 @@ services:
     environment:
       - REACT_APP_API_URL=https://maski.strupino.pl/api
       - REACT_APP_KEYCLOAK_URL=https://maski.strupino.pl/auth
-      - REACT_APP_KEYCLOAK_REALM=myrealm
-      - REACT_APP_KEYCLOAK_CLIENT_ID=myclient
+      - REACT_APP_KEYCLOAK_REALM=frontend
+      - REACT_APP_KEYCLOAK_CLIENT_ID=frontend
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -54,7 +54,7 @@ services:
     depends_on:
       - frontend
       - backend
-      - keycloak 
+      - keycloak
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     environment:
@@ -73,8 +73,8 @@ services:
       KC_HOSTNAME_STRICT_HTTPS: "true"
       KC_HOSTNAME_ADMIN: maski.strupino.pl
       KC_HTTP_PORT: 8080
-      KC_HTTPS_PORT: 8080 
-      KC_LOG_LEVEL: ALL
+      KC_HTTPS_PORT: 8080
+      KC_LOG_LEVEL: DEBUG
       KC_METRICS_ENABLED: true
       KEYCLOAK_FRONTEND_URL: https://maski.strupino.pl/auth
       KC_PROXY: edge
@@ -83,7 +83,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    command: ["start-dev"]
+    command: ["start"]
 
 volumes:
   db-data:
